@@ -1,0 +1,28 @@
+training:
+  num_episodes: 10000
+  eval_frequency: 500
+  save_frequency: 1000
+  early_stopping_patience: 5
+  
+  logging:
+    use_tensorboard: true
+    use_wandb: false
+    log_frequency: 100
+  
+  compute:
+    device: "cpu"  # cuda, cpu
+    num_workers: 4
+    seed: 42
+
+phase1:
+  subset_size: 10000  # Number of users
+  candidate_pool: 100
+  max_session_days: 3
+
+phase2:
+  subset_size: 50000
+  candidate_pool: 300
+
+phase3:
+  subset_size: null  # Full dataset
+  candidate_pool: 1000

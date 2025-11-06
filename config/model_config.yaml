@@ -1,0 +1,44 @@
+models:
+  dqn:
+    network:
+      hidden_dims: [256, 128, 64]
+      activation: "relu"
+      dropout: 0.1
+    
+    training:
+      learning_rate: 0.0001
+      gamma: 0.99
+      epsilon_start: 1.0
+      epsilon_end: 0.01
+      epsilon_decay: 0.995
+      batch_size: 64
+      buffer_size: 100000
+      target_update_frequency: 1000
+  
+  dueling_dqn:
+    network:
+      hidden_dims: [256, 128]
+      value_hidden_dim: 64
+      advantage_hidden_dim: 64
+      activation: "relu"
+    
+    training:
+      learning_rate: 0.0001
+      gamma: 0.99
+      batch_size: 64
+  
+  cmab:
+    alpha: 1.0
+    lambda_reg: 1.0
+    context_dim: 768
+
+baselines:
+  collaborative_filtering:
+    n_factors: 50
+    n_epochs: 20
+    lr: 0.005
+  
+  supervised:
+    hidden_dims: [256, 128, 64]
+    dropout: 0.2
+    learning_rate: 0.001

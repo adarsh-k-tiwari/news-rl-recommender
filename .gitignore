@@ -25,6 +25,15 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+env/
+venv/
+ENV/
+.env
+
+# Data (large files)
+data/raw/*
+data/processed/*
+
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -77,6 +86,7 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+*.ipynb_checkpoints/
 
 # IPython
 profile_default/
