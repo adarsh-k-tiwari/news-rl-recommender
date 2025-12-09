@@ -89,7 +89,6 @@ python -m src.models.sac.train_sac
 ```
 
 #### Option 2: Using pre-trained models
-If you wish to test the web interface or evaluation scripts without waiting for training:
 1. Download the full `data.zip` folder from our [Google Drive](https://drive.google.com/drive/folders/1hkcqKRMCE3AxIjfW7kCSCftYD3PdLvYy?usp=sharing)
 2. Delete your existing data/ folder in the project root
 3. Extract the downloaded zip file so that the new data/ folder replaces it
