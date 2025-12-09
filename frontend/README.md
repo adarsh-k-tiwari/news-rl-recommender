@@ -4,12 +4,11 @@ Modern React.js frontend for the News Recommendation System with TikTok-like inf
 
 ## Features
 
-- 🎯 TikTok-style infinite scroll interface
-- ❤️ Like/Dislike interactions
-- 📊 Real-time metrics dashboard
-- 🎨 Modern UI with smooth animations
-- 🤖 Multiple RL model support
-- 📱 Responsive design
+- Flash card scroll interface
+- Like/Dislike interactions
+- Real-time metrics dashboard
+- Multiple RL model support
+- Responsive design
 
 ## Setup
 
