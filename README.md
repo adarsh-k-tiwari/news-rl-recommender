@@ -1,6 +1,6 @@
 # Personalized News Recommendation System using Reinforcement Learning
 
-A RL-based news recommendation system with an interactive web interface to optimize long-term user engagement using the MIND dataset. Features real-time training, multiple RL algorithms (CMAB, DQN, Dueling DQN, SAC), and a modern TikTok-style swipe interface with live performance metrics.
+A RL-based news recommendation system with an interactive web interface to optimize long-term user engagement using the MIND dataset. Features real-time training, multiple RL algorithms (CMAB, DQN, Dueling DQN, SAC), and a A&M Themed Scroll interface with live performance metrics.
 
 ## Authors
 - Adarsh Kumar (635009465)
