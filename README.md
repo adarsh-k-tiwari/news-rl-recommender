@@ -254,11 +254,6 @@ data/processed/
 - Configurable through simulation panel
 - Works with any combination of categories (e.g., `sports,news`, `foodanddrink,tv`)
 
-### Real-Time Learning
-- Models update after each interaction
-- Epsilon-greedy exploration for RL agents
-- Adaptive learning rates
-- Session-based state management
 
 ## Evaluation Metrics
 - **Short-term**: CTR, average reward per session, prediction accuracy
