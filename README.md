@@ -88,6 +88,7 @@ Output:
 - Console output will display a table ranking the models by performance
 
 ## Running the Interactive Application
+Read Setup.md first to setup React and Necessary Libraries in system.
 1. **Start the Backend API:**
    ```bash
    # Make sure virtual environment is activated
