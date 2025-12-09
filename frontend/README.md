@@ -1,6 +1,6 @@
 # News RL Recommender - Frontend
 
-Modern React.js frontend for the News Recommendation System with TikTok-like infinite scroll interface.
+Modern React.js frontend for the News Recommendation System with flashcard like interface.
 
 ## Features
 
