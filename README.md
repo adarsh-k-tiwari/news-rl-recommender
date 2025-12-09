@@ -214,7 +214,6 @@ data/processed/
 
 ### Multi-Category Support
 - Automatically detects user's preferred categories
-- Round-robin selection ensures equal representation
 - Configurable through simulation panel
 - Works with any combination of categories (e.g., `sports,news`, `foodanddrink,tv`)
 
@@ -222,7 +221,6 @@ data/processed/
 - Models update after each interaction
 - Epsilon-greedy exploration for RL agents
 - Adaptive learning rates
-- Session-based state management
 
 ## Evaluation Metrics
 - **Short-term**: CTR, average reward per session, prediction accuracy
