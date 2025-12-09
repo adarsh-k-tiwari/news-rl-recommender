@@ -150,7 +150,7 @@ news-rl-recommender/
 3. Model learns from your feedback in real-time
 4. Watch metrics update as you interact
 
-#### Option 2: Automated Simulation Training
+#### Option 2: Automated Simulation Training ( Recommended Due to Cold Start Problem )
 1. Enter preferred genres (e.g., `politics,sports`)
 2. Set match probability (recommended: 0.9)
 3. Set total interactions (recommended: 1000+)
