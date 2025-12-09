@@ -1,6 +1,6 @@
 # Personalized News Recommendation System using Reinforcement Learning
 
-A RL-based news recommendation system with an interactive web interface to optimize long-term user engagement using the MIND dataset. Features real-time training, multiple RL algorithms (CMAB, DQN, Dueling DQN, SAC), and a A&M Themed Scroll interface with live performance metrics.
+A RL-based news recommendation system with an interactive web interface to optimize long-term user engagement using the MIND dataset. Features real-time training, multiple RL algorithms (CMAB, DQN, Dueling DQN, SAC), and a TAMU AUX themed interface with live performance metrics.
 
 ## Authors
 - Adarsh Kumar (635009465)
@@ -13,7 +13,6 @@ This project formulates personalized news recommendation as a Markov Decision Pr
 - **Interactive Web Interface**: Modern React-based UI with real-time metrics
 - **Automatic Simulation**: Train models with automated user interactions
 - **Category-Based Learning**: Uses one-hot encoding for news categories
-- **Real-Time Training**: Models learn from user feedback during interaction
 - **Performance Tracking**: Live dashboards showing rewards, Q-values, and category preferences
 
 ## Quick Start Guide
@@ -25,7 +24,7 @@ This project formulates personalized news recommendation as a Markov Decision Pr
 
 ### 1. Clone Repository
 ```bash
-git clone <repository-url>
+git clone https://github.com/adarsh-k-tiwari/news-rl-recommender.git
 cd news-rl-recommender
 ```
 
@@ -59,37 +58,78 @@ The MIND dataset is required for the recommendation system:
 
 ### 4. Preprocess Data
 ```bash
-python scripts/preprocess_data.py
+python -m scripts.preprocess_data
 ```
 
 This will generate:
 - Category embeddings in `data/processed/embeddings/`
 - Preprocessing metadata in `data/processed/metadata/`
+- Train and Dev Sessions in `data/processed/sessions/`
 - Model checkpoints (if any exist) in `data/processed/*.pth`
+
+### 5. Model Training
+You can either train the Reinforcement Learning agents from scratch or use our pre-trained models to skip the training time.
+#### Option 1: Training from scratch
+Run the following commands to train individual agents. Each script will save the best model checkpoint to `data/processed/`.
+```bash
+# 1. Supervised Baseline: Trains a standard classifier to predict clicks
+python -m src.models.train_supervised
+
+# 2. Deep Q-Network (DQN): Trains an agent using Value-Based RL with Experience Replay
+python -m src.models.dqn.train_dqn
+
+# 3. Dueling DQN: An improvement over DQN that separates State-Value and Action-Advantage
+python -m src.models.dqn.train_ddqn
+
+# 4. Contextual Bandit (CMAB): A "greedy" agent that optimizes for immediate reward (no future planning)
+python -m src.models.cmab.train_cmab
+
+# 5. Soft Actor-Critic (SAC): The advanced agent that balances Accuracy vs. Diversity (Entropy)
+python -m src.models.sac.train_sac
+```
+
+#### Option 2: Using pre-trained models
+If you wish to test the web interface or evaluation scripts without waiting for training:
+1. Download the full `data.zip` folder from our [Google Drive](https://drive.google.com/drive/folders/1hkcqKRMCE3AxIjfW7kCSCftYD3PdLvYy?usp=sharing)
+2. Delete your existing data/ folder in the project root
+3. Extract the downloaded zip file so that the new data/ folder replaces it
+4. This folder contains all processed embeddings and trained .pth model files
+
+### 6. Model Evaluation
+Generate a comparative report of all trained models (Random, Popularity, Supervised, DQN, CMAB, SAC).
+```bash
+python -m scripts.evaluate_final
+```
+Output:
+- This script calculates key metrics: Click-Through Rate (CTR), Average Reward, and Diversity Scores
+- It generates comparison plots saved in the experiments/ or results/ directory
+- Console output will display a table ranking the models by performance
 
 ## Project Structure
 ```
 news-rl-recommender/
-├── config/              # Configuration files
-├── data/               # MIND dataset (raw and processed)
-├── src/                # Source code
-│   ├── data/          # Data loading and preprocessing
-│   ├── environment/   # RL environment (RecoGym adaptation)
-│   ├── features/      # Feature engineering (embeddings)
-│   ├── models/        # Baselines and RL agents
-│   ├── training/      # Training loops
-│   ├── evaluation/    # Evaluation metrics
-│   └── utils/         # Utilities
-├── frontend/          # React.js web interface (NEW!)
+├── config/                 # Configuration files
+├── data/                   # MIND dataset (raw and processed)
+├── results/                # Contains graphs
+├── src/                    # Source code
+│   ├── data/               # MIND download and parse script for sessions
+│   ├── environment/        # RL environment (RecoGym adaptation)
+│   ├── features/           # Feature engineering (embeddings)
+│   ├── models/             # Baselines and RL agents training script
+│   ├── training/           # Training loops
+│   ├── evaluation/         # Evaluation metrics
+├── frontend/               # React.js web interface (NEW!)
 │   ├── src/
-│   │   ├── components/  # UI components
-│   │   └── services/    # API client
+│   │   ├── components/     # UI components
+│   │   └── services/       # API client
 │   └── package.json
-├── api_server.py      # Flask API server (NEW!)
-├── notebooks/         # Jupyter notebooks for exploration
-├── experiments/       # Experiment results
-├── scripts/          # Utility scripts
-└── tests/            # Unit tests
+├── api_server.py           # Flask API server
+├── notebooks/              # Jupyter notebooks for data exploration
+├── scripts/                # Utility scripts
+├── LICENSE                 # License file
+├── requirements.txt        # Project's module dependencies
+├── SETUP.md                # Setup file for the web app
+├── Readme.md               # This file
 ```
 
 ## Running the Interactive Application
@@ -123,8 +163,7 @@ news-rl-recommender/
    - Progress bar shows reading time
 
 2. **Model Selection:**
-   - Switch between RL models (Supervised, DQN, Dueling DQN)
-   - CMAB and SAC buttons visible (display only)
+   - Switch between RL models (Supervised, DQN, Dueling DQN, CMAB, SAC)
    - Selected model shown in dashboard
 
 3. **Simulation Panel:**
@@ -132,7 +171,7 @@ news-rl-recommender/
    - **Match Probability:** Likelihood of liking preferred categories (0.0-1.0)
    - **Other Probability:** Likelihood of liking other categories
    - **Total Interactions:** Number of automated interactions to simulate
-   - Click "Start Simulation" to train model automatically
+   - Click `Start Simulation` to train model automatically
 
 4. **Real-Time Metrics:**
    - **RL Performance:** Shows total reward and recommendations over time
@@ -142,36 +181,6 @@ news-rl-recommender/
    - **Category Preferences:** Pie chart of user preferences
    - **Recent Rewards:** Timeline of model performance
 
-### Training Models
-
-#### Option 1: Interactive Manual Training
-1. Select a model from the Model Selector
-2. Like/dislike articles as they appear
-3. Model learns from your feedback in real-time
-4. Watch metrics update as you interact
-
-#### Option 2: Automated Simulation Training ( Recommended Due to Cold Start Problem )
-1. Enter preferred genres (e.g., `politics,sports`)
-2. Set match probability (recommended: 0.9)
-3. Set total interactions (recommended: 1000+)
-4. Click "Start Simulation"
-5. Watch automated training progress
-6. Model adapts to simulated user preferences
-
-#### Option 3: Pre-training (Optional)
-```bash
-# Train supervised baseline
-python src/models/baseline/train_supervised.py
-
-# Train DQN
-python src/models/dqn/train_dqn.py
-
-# Train Dueling DQN
-python src/models/dqn/train_ddqn.py
-
-# Train CMAB
-python src/models/cmab/train_cmab.py
-```
 
 ### Understanding the Metrics
 
@@ -184,7 +193,7 @@ python src/models/cmab/train_cmab.py
 
 ## Technical Architecture
 
-## Interactive RL Enviorment
+## Interactive RL Environment
 ### Backend (Flask API)
 - **Framework:** Flask with CORS enabled
 - **Models:** PyTorch-based RL agents (DQN, Dueling DQN, CMAB, SAC, Supervised)
@@ -205,7 +214,6 @@ python src/models/cmab/train_cmab.py
   - Real-time metrics dashboard
   - Automated simulation control
   - Model switching
-  - 
 
 ### Key Components
 
@@ -250,9 +258,15 @@ data/processed/
 
 ### Multi-Category Support
 - Automatically detects user's preferred categories
+- Round-robin selection ensures equal representation
 - Configurable through simulation panel
 - Works with any combination of categories (e.g., `sports,news`, `foodanddrink,tv`)
 
+### Real-Time Learning
+- Models update after each interaction
+- Epsilon-greedy exploration for RL agents
+- Adaptive learning rates
+- Session-based state management
 
 ## Evaluation Metrics
 - **Short-term**: CTR, average reward per session, prediction accuracy
@@ -272,11 +286,13 @@ data/processed/
 - MIND Dataset: [Microsoft News Dataset](https://msnews.github.io/)
 - DQN Paper: [Playing Atari with Deep Reinforcement Learning](https://arxiv.org/abs/1312.5602)
 - Dueling DQN: [Dueling Network Architectures](https://arxiv.org/abs/1511.06581)
+- CMAB: [Combinatorial Multi-Armed Bandit](https://proceedings.mlr.press/v28/chen13a.html)
+- SAC: [Soft Actor Critic](https://arxiv.org/abs/1812.05905)
 
 ## License
 This project is for educational purposes as part of CSCE 642 - Deep Reinforcement Learning course at Texas A&M University.
 
 ## Contact
 For questions or issues:
-- Adarsh Kumar: adarsh.k.tiwari@tamu.edu
+- Adarsh Kumar: adarsh0801@tamu.edu
 - Neil Roy: neilroy@tamu.edu
