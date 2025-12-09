@@ -15,95 +15,6 @@ This project formulates personalized news recommendation as a Markov Decision Pr
 - **Category-Based Learning**: Uses one-hot encoding for news categories
 - **Performance Tracking**: Live dashboards showing rewards, Q-values, and category preferences
 
-## Quick Start Guide
-
-### Prerequisites
-- Python 3.8 or higher
-- Node.js 16+ and npm (for frontend) ( Very Important , Dashboard is made with React)
-- Git
-
-### 1. Clone Repository
-```bash
-git clone https://github.com/adarsh-k-tiwari/news-rl-recommender.git
-cd news-rl-recommender
-```
-
-### 2. Setup Python Environment
-```bash
-# Create virtual environment
-python -m venv venv
-
-# Activate virtual environment
-# On Windows:
-venv\Scripts\activate
-# On macOS/Linux:
-source venv/bin/activate
-
-# Install Python dependencies
-pip install -r requirements.txt
-```
-
-### 3. Download MIND Dataset
-The MIND dataset is required for the recommendation system:
-
-1. Visit [MSNews GitHub](https://msnews.github.io/index.html#getting-start)
-2. Accept the License Terms
-3. Download the dataset (MINDsmall recommended for testing)
-4. Extract to `data/raw/` directory:
-   ```
-   data/raw/dev/
-   data/raw/train/
-   data/raw/test/
-   ```
-
-### 4. Preprocess Data
-```bash
-python -m scripts.preprocess_data
-```
-
-This will generate:
-- Category embeddings in `data/processed/embeddings/`
-- Preprocessing metadata in `data/processed/metadata/`
-- Train and Dev Sessions in `data/processed/sessions/`
-- Model checkpoints (if any exist) in `data/processed/*.pth`
-
-### 5. Model Training
-You can either train the Reinforcement Learning agents from scratch or use our pre-trained models to skip the training time.
-#### Option 1: Training from scratch
-Run the following commands to train individual agents. Each script will save the best model checkpoint to `data/processed/`.
-```bash
-# 1. Supervised Baseline: Trains a standard classifier to predict clicks
-python -m src.models.train_supervised
-
-# 2. Deep Q-Network (DQN): Trains an agent using Value-Based RL with Experience Replay
-python -m src.models.dqn.train_dqn
-
-# 3. Dueling DQN: An improvement over DQN that separates State-Value and Action-Advantage
-python -m src.models.dqn.train_ddqn
-
-# 4. Contextual Bandit (CMAB): A "greedy" agent that optimizes for immediate reward (no future planning)
-python -m src.models.cmab.train_cmab
-
-# 5. Soft Actor-Critic (SAC): The advanced agent that balances Accuracy vs. Diversity (Entropy)
-python -m src.models.sac.train_sac
-```
-
-#### Option 2: Using pre-trained models
-If you wish to test the web interface or evaluation scripts without waiting for training:
-1. Download the full `data.zip` folder from our [Google Drive](https://drive.google.com/drive/folders/1hkcqKRMCE3AxIjfW7kCSCftYD3PdLvYy?usp=sharing)
-2. Delete your existing data/ folder in the project root
-3. Extract the downloaded zip file so that the new data/ folder replaces it
-4. This folder contains all processed embeddings and trained .pth model files
-
-### 6. Model Evaluation
-Generate a comparative report of all trained models (Random, Popularity, Supervised, DQN, CMAB, SAC).
-```bash
-python -m scripts.evaluate_final
-```
-Output:
-- This script calculates key metrics: Click-Through Rate (CTR), Average Reward, and Diversity Scores
-- It generates comparison plots saved in the experiments/ or results/ directory
-- Console output will display a table ranking the models by performance
 
 ## Project Structure
 ```
@@ -132,7 +43,52 @@ news-rl-recommender/
 ├── Readme.md               # This file
 ```
 
-## Running the Interactive Application
+## Quick Start Guide
+
+### Prerequisites
+- Python 3.8 or higher
+- Node.js 16+ and npm (for frontend) ( Very Important , Dashboard is made with React) ( Only Needed For Interactive UI ## OPTIONAL)
+- Git
+
+### 1. Clone Repository
+```bash
+git clone https://github.com/adarsh-k-tiwari/news-rl-recommender.git
+cd news-rl-recommender
+```
+
+### 2. Setup Python Environment
+```bash
+# Create virtual environment
+python -m venv venv
+
+# Activate virtual environment
+# On Windows:
+venv\Scripts\activate
+# On macOS/Linux:
+source venv/bin/activate
+
+# Install Python dependencies
+pip install -r requirements.txt
+```
+
+### 3. Using pre-trained models
+1. Download the full `data.zip` folder from our [Google Drive](https://drive.google.com/drive/folders/1hkcqKRMCE3AxIjfW7kCSCftYD3PdLvYy?usp=sharing)
+2. Delete your existing data/ folder in the project root
+3. Extract the downloaded zip file so that the new data/ folder replaces it
+4. This folder contains all processed embeddings and trained .pth model files
+
+### 4. Model Evaluation
+Generate a comparative report of all trained models (Random, Popularity, Supervised, DQN, CMAB, SAC).
+```bash
+python -m scripts.evaluate_final
+```
+Output:
+- This script calculates key metrics: Click-Through Rate (CTR), Average Reward, and Diversity Scores
+- It generates comparison plots saved in the experiments/ or results/ directory
+- Console output will display a table ranking the models by performance
+
+## Running the Interactive Application (Optional)
+Read Setup.md first to setup React and Necessary Libraries in system.
 1. **Start the Backend API:**
    ```bash
    # Make sure virtual environment is activated
@@ -258,7 +214,6 @@ data/processed/
 
 ### Multi-Category Support
 - Automatically detects user's preferred categories
-- Round-robin selection ensures equal representation
 - Configurable through simulation panel
 - Works with any combination of categories (e.g., `sports,news`, `foodanddrink,tv`)
 
@@ -266,7 +221,6 @@ data/processed/
 - Models update after each interaction
 - Epsilon-greedy exploration for RL agents
 - Adaptive learning rates
-- Session-based state management
 
 ## Evaluation Metrics
 - **Short-term**: CTR, average reward per session, prediction accuracy
