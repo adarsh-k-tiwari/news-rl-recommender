@@ -37,12 +37,11 @@ The built files will be in the `dist` directory.
 - **React 18** - UI framework
 - **Vite** - Build tool
 - **Tailwind CSS** - Styling
-- **Framer Motion** - Animations
 - **Recharts** - Data visualization
 - **Axios** - HTTP client
 - **Lucide React** - Icons
 
-## Project Structure
+## Project Structure For the Frontend Part
 
 ```
 frontend/
