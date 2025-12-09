@@ -1,7 +1,3 @@
-"""
-Article Encoder for MIND Dataset
-Converts news articles into dense vector representations using pre-trained language models.
-"""
 
 import torch
 import torch.nn as nn
@@ -18,11 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 class ArticleEncoder:
-    """
-    Encodes news articles into fixed-size embeddings using BERT-based models.
-    Supports caching for efficiency.
-    """
-    
+
     def __init__(
         self,
         model_name: str = 'sentence-transformers/all-MiniLM-L6-v2',
@@ -31,16 +23,6 @@ class ArticleEncoder:
         device: str = 'cuda' if torch.cuda.is_available() else 'cpu',
         cache_dir: Optional[str] = None
     ):
-        """
-        Initialize article encoder.
-        
-        Args:
-            model_name: HuggingFace model name (default: MiniLM for efficiency)
-            embedding_dim: Output embedding dimension
-            max_length: Maximum token length
-            device: Device to run model on
-            cache_dir: Directory to cache embeddings
-        """
         self.model_name = model_name
         self.embedding_dim = embedding_dim
         self.max_length = max_length
@@ -64,32 +46,13 @@ class ArticleEncoder:
         logger.info(f"ArticleEncoder initialized on {device}")
     
     def _mean_pooling(self, token_embeddings: torch.Tensor, attention_mask: torch.Tensor) -> torch.Tensor:
-        """
-        Perform mean pooling on token embeddings.
-        
-        Args:
-            token_embeddings: Token-level embeddings [batch_size, seq_len, hidden_dim]
-            attention_mask: Attention mask [batch_size, seq_len]
-            
-        Returns:
-            Pooled embeddings [batch_size, hidden_dim]
-        """
         input_mask_expanded = attention_mask.unsqueeze(-1).expand(token_embeddings.size()).float()
         sum_embeddings = torch.sum(token_embeddings * input_mask_expanded, dim=1)
         sum_mask = torch.clamp(input_mask_expanded.sum(dim=1), min=1e-9)
         return sum_embeddings / sum_mask
     
     def encode_text(self, texts: Union[str, List[str]], batch_size: int = 32) -> np.ndarray:
-        """
-        Encode text(s) into embeddings.
-        
-        Args:
-            texts: Single text or list of texts
-            batch_size: Batch size for processing
-            
-        Returns:
-            Embeddings as numpy array [num_texts, embedding_dim]
-        """
+
         if isinstance(texts, str):
             texts = [texts]
         
@@ -127,20 +90,7 @@ class ArticleEncoder:
         category: Optional[str] = None,
         use_cache: bool = True
     ) -> np.ndarray:
-        """
-        Encode a single news article.
-        
-        Args:
-            news_id: Unique article identifier
-            title: Article title
-            abstract: Article abstract (optional)
-            category: Article category (optional, can be used for enrichment)
-            use_cache: Whether to use cached embedding if available
-            
-        Returns:
-            Article embedding [embedding_dim]
-        """
-        # Check cache
+
         if use_cache and news_id in self.embedding_cache:
             return self.embedding_cache[news_id]
         
@@ -164,17 +114,7 @@ class ArticleEncoder:
         batch_size: int = 32,
         show_progress: bool = True
     ) -> Dict[str, np.ndarray]:
-        """
-        Encode multiple articles in batch (more efficient).
-        
-        Args:
-            articles: List of article dicts with keys: news_id, title, abstract
-            batch_size: Batch size for encoding
-            show_progress: Show progress bar
-            
-        Returns:
-            Dictionary mapping news_id to embedding
-        """
+
         embeddings = {}
         texts_to_encode = []
         news_ids = []
@@ -227,41 +167,15 @@ class ArticleEncoder:
         return embeddings
     
     def encode_from_dataframe(self, df, batch_size: int = 32) -> Dict[str, np.ndarray]:
-        """
-        Encode articles from a pandas DataFrame (MIND format).
-        
-        Args:
-            df: DataFrame with columns: news_id, title, abstract, category
-            batch_size: Batch size for encoding
-            
-        Returns:
-            Dictionary mapping news_id to embedding
-        """
         articles = df.to_dict('records')
         return self.encode_articles_batch(articles, batch_size=batch_size)
     
     def get_embedding(self, news_id: str) -> Optional[np.ndarray]:
-        """
-        Get cached embedding for a news article.
-        
-        Args:
-            news_id: Article ID
-            
-        Returns:
-            Embedding or None if not cached
-        """
+
         return self.embedding_cache.get(news_id)
     
     def get_embeddings(self, news_ids: List[str]) -> np.ndarray:
-        """
-        Get embeddings for multiple articles.
-        
-        Args:
-            news_ids: List of article IDs
-            
-        Returns:
-            Stacked embeddings [num_articles, embedding_dim]
-        """
+
         embeddings = []
         for news_id in news_ids:
             emb = self.get_embedding(news_id)
@@ -275,12 +189,7 @@ class ArticleEncoder:
         return np.array(embeddings)
     
     def save_cache(self, path: Optional[str] = None):
-        """
-        Save embedding cache to disk.
-        
-        Args:
-            path: Path to save cache (uses cache_dir if None)
-        """
+
         if path is None:
             if self.cache_dir is None:
                 raise ValueError("No cache directory specified")
@@ -295,7 +204,6 @@ class ArticleEncoder:
         logger.info(f"Saved {len(self.embedding_cache)} embeddings to {path}")
     
     def _load_cache(self):
-        """Load embedding cache from disk."""
         cache_path = self.cache_dir / 'article_embeddings.pkl'
         
         if cache_path.exists():
@@ -306,24 +214,14 @@ class ArticleEncoder:
             logger.info("No cache file found, starting fresh")
     
     def clear_cache(self):
-        """Clear the embedding cache."""
         self.embedding_cache.clear()
         logger.info("Cache cleared")
 
 
 class CategoryEncoder:
-    """
-    Encodes categorical features (category, subcategory) as one-hot or learned embeddings.
-    """
-    
+
     def __init__(self, categories: List[str], embedding_dim: int = 16):
-        """
-        Initialize category encoder.
-        
-        Args:
-            categories: List of unique categories
-            embedding_dim: Dimension of category embeddings
-        """
+
         self.categories = sorted(categories)
         self.category_to_idx = {cat: idx for idx, cat in enumerate(self.categories)}
         self.embedding_dim = embedding_dim
@@ -335,30 +233,14 @@ class CategoryEncoder:
         logger.info(f"CategoryEncoder initialized with {len(self.categories)} categories")
     
     def encode(self, category: str) -> np.ndarray:
-        """
-        Encode a single category.
-        
-        Args:
-            category: Category name
-            
-        Returns:
-            Category embedding [embedding_dim]
-        """
+
         idx = self.category_to_idx.get(category, 0)  # Use 0 as default for unknown
         with torch.no_grad():
             embedding = self.embedding(torch.tensor([idx]))
         return embedding.numpy()[0]
     
     def encode_batch(self, categories: List[str]) -> np.ndarray:
-        """
-        Encode multiple categories.
-        
-        Args:
-            categories: List of category names
-            
-        Returns:
-            Category embeddings [num_categories, embedding_dim]
-        """
+
         indices = [self.category_to_idx.get(cat, 0) for cat in categories]
         with torch.no_grad():
             embeddings = self.embedding(torch.tensor(indices))

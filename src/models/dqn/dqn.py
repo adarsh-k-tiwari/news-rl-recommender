@@ -12,10 +12,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class QNetwork(nn.Module):
-    """
-    Approximates Q(s, a).
-    Architecture is identical to the Supervised ClickPredictor for fair comparison.
-    """
+
     def __init__(self, state_dim, article_emb_dim, hidden_dim=128):
         super(QNetwork, self).__init__()
         self.net = nn.Sequential(
@@ -57,8 +54,9 @@ class DQNAgent:
         learning_rate=1e-4, 
         gamma=0.95,          # Discount factor for future rewards
         epsilon_start=1.0,   # Exploration rate
-        epsilon_end=0.05,
+        epsilon_end=0.20,
         epsilon_decay=0.995,
+
         buffer_size=50000,
         device='cpu'
     ):
@@ -80,22 +78,14 @@ class DQNAgent:
         self.loss_fn = nn.MSELoss()
 
     def select_action(self, state, candidate_embeddings, eval_mode=False):
-        """
-        Select action using Epsilon-Greedy policy.
-        Returns: (index of selected action, embedding of selected action)
-        """
         k = len(candidate_embeddings)
         
-        # Exploration
         if not eval_mode and random.random() < self.epsilon:
             action_idx = random.randint(0, k-1)
             return action_idx, candidate_embeddings[action_idx]
-        
-        # Exploitation (Greedy)
         state_tensor = torch.FloatTensor(state).unsqueeze(0).to(self.device)
         cand_tensor = torch.FloatTensor(candidate_embeddings).to(self.device)
         
-        # Repeat state to match candidates
         state_repeated = state_tensor.repeat(k, 1)
         
         with torch.no_grad():
@@ -110,8 +100,7 @@ class DQNAgent:
         
         transitions = self.memory.sample(batch_size)
         
-        # Unpack batch
-        # Note: 'next_candidates' is a list of arrays, one for each sample in batch
+
         states, action_embs, rewards, next_states, next_candidates_list, dones = zip(*transitions)
         
         states = torch.FloatTensor(np.array(states)).to(self.device)
@@ -120,12 +109,9 @@ class DQNAgent:
         next_states = torch.FloatTensor(np.array(next_states)).to(self.device)
         dones = torch.FloatTensor(dones).unsqueeze(1).to(self.device)
         
-        # 1. Compute current Q(s, a)
         current_q_values = self.policy_net(states, action_embs)
         
-        # 2. Compute Max Q(s', a') for target
-        # This is tricky because each sample has a DIFFERENT set of candidates.
-        # We must process them one by one or pad them. Loop is easier for this scale.
+
         next_max_q = []
         
         with torch.no_grad():
@@ -136,21 +122,16 @@ class DQNAgent:
                 
                 ns = next_states[i].unsqueeze(0) # [1, state_dim]
                 nc = torch.FloatTensor(next_candidates_list[i]).to(self.device) # [K, emb_dim]
-                
-                # Expand state
                 ns_repeated = ns.repeat(len(nc), 1)
                 
-                # Get Q-values from TARGET network
                 target_q = self.target_net(ns_repeated, nc)
                 max_q = target_q.max().item()
                 next_max_q.append(max_q)
         
         next_max_q = torch.FloatTensor(next_max_q).unsqueeze(1).to(self.device)
         
-        # 3. Compute Bellman Target
         target_q_values = rewards + (self.gamma * next_max_q * (1 - dones))
         
-        # 4. Gradient Descent
         loss = self.loss_fn(current_q_values, target_q_values)
         
         self.optimizer.zero_grad()

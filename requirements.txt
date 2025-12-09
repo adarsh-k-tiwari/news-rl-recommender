@@ -38,3 +38,7 @@ pytest-cov>=4.1.0
 notebook>=6.5.0
 ipykernel>=6.22.0
 ipython>=8.13.0
+
+# API Server
+flask>=3.0.0
+flask-cors>=4.0.0

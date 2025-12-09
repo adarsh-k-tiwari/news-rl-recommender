@@ -69,18 +69,42 @@ if 'current_candidates' not in st.session_state:
     st.session_state.current_candidates = []
 
 # --- 3. HELPER FUNCTIONS ---
-def get_recommendation():
+st.title("📰 Personalized News Recommendation System")
+st.caption("Powered by your RL-trained agent.")
+
+st.markdown("### 🔎 Choose Categories You're Interested In")
+all_categories = sorted(news_df["category"].unique())
+
+default_cats = ["sports", "finance"]
+
+selected_categories = st.multiselect(
+    "Filter news by categories",
+    options=all_categories,
+    default=default_cats,
+    help="This filter affects the candidate pool before the RL agent ranks articles."
+)
+
+# Build pool AND fallback if filter empty
+if len(selected_categories) > 0:
+    filtered_pool = news_df[news_df["category"].isin(selected_categories)].index.tolist()
+else:
+    filtered_pool = news_df.index.tolist()
+
+#=============================
+# 2. GRID-BASED NEWS CARDS
+#=============================
+
+st.markdown("## 🧠 Recommended For You")
+
+# --- Replace sampling logic ---
+def get_recommendations(count=6):
     """
-    1. Sample random candidates from the news pool.
-    2. Use the Agent to rank them based on current user history.
-    3. Return the best one.
+    Return top-k recommended article IDs using the RL agent.
     """
-    # 1. Sample 50 random articles as candidates
-    all_news_ids = list(news_df.index)
-    candidates = random.sample(all_news_ids, 50)
-    
-    # 2. Build Current State
-    # Note: We are mocking the session features for this demo
+    # Step 1: sample 50 candidates from filtered pool
+    candidates = random.sample(filtered_pool, min(50, len(filtered_pool)))
+
+    # Step 2: build state
     state = state_builder.build_state(
         history_news_ids=st.session_state.history,
         timestamp=pd.Timestamp.now(),
@@ -88,76 +112,81 @@ def get_recommendation():
         session_clicks=st.session_state.clicks,
         session_impressions=st.session_state.impressions
     )
-    
-    # 3. Agent Prediction
-    # Mocking the env object just to pass candidates to the agent
+
+    # Step 3: RL agent ranks them
     class MockEnv:
-        def __init__(self, cands): self.current_candidates = cands
-        def get_candidate_embeddings(self): return article_encoder.get_embeddings(cands)
-    
+        def __init__(self, cands): 
+            self.current_candidates = cands
+        def get_candidate_embeddings(self):
+            return article_encoder.get_embeddings(self.current_candidates)
+
     mock_env = MockEnv(candidates)
-    best_idx = agent.predict(state, mock_env)
-    recommended_id = candidates[best_idx]
+    scores = agent.predict(state, mock_env)  # You may use agent.predict OR full scoring
+    ranked = np.argsort(scores)[::-1]  # best to worst
     
-    return recommended_id, state
+    top_ids = [candidates[i] for i in ranked[:count]]
+    return top_ids
 
-# --- 4. MAIN UI LAYOUT ---
-st.title("🤖 Personal News Feed")
-st.markdown("This system learns from your clicks using **Deep Learning**.")
 
-# Sidebar for Stats
+#=============================
+# 3. DISPLAY RECOMMENDATIONS
+#=============================
+if 'recommendations' not in st.session_state:
+    st.session_state.recommendations = get_recommendations()
+
+cols = st.columns(3)  # 3 cards per row
+
+for idx, news_id in enumerate(st.session_state.recommendations):
+    article = news_df.loc[news_id]
+
+    with cols[idx % 3]:
+        st.markdown(
+            f"""
+            <div style='padding:15px; border-radius:10px; background:#f8f9fa;
+                        border:1px solid #ddd; height:310px; display:flex; flex-direction:column; justify-content:space-between;'>
+                <h4 style='margin-bottom:8px'>{article['title'][:80]}</h4>
+                <span style='font-size:12px; color:#555;'>Category: <b>{article['category']}</b></span>
+                <p style='font-size:13px; color:#333; height:80px; overflow:hidden;'>{article['abstract'][:150]}...</p>
+            """,
+            unsafe_allow_html=True
+        )
+
+        colA, colB = st.columns(2)
+
+        def handle_click(clicked, news_id=news_id):
+            st.session_state.impressions += 1
+            if clicked:
+                st.session_state.clicks += 1
+                st.session_state.history.append(news_id)
+
+            # refresh recommendations
+            st.session_state.recommendations = get_recommendations()
+
+        with colA:
+            st.button("Read", key=f"read_{news_id}", on_click=handle_click, args=(True,))
+        with colB:
+            st.button("Skip", key=f"skip_{news_id}", on_click=handle_click, args=(False,))
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+#=============================
+# 4. SIDEBAR PROFILE
+#=============================
+
 with st.sidebar:
-    st.header("User Profile")
+    st.header("📊 Your Reader Profile")
     st.metric("Articles Read", st.session_state.clicks)
     st.metric("Total Impressions", st.session_state.impressions)
     ctr = (st.session_state.clicks / st.session_state.impressions * 100) if st.session_state.impressions > 0 else 0
-    st.metric("CTR", f"{ctr:.1f}%")
-    
-    st.subheader("Reading History")
-    for news_id in reversed(st.session_state.history[-5:]): # Show last 5
-        try:
-            title = news_df.loc[news_id]['title']
-            st.caption(f"📄 {title[:40]}...")
-        except:
-            pass
+    st.metric("CTR", f"{ctr:.2f}%")
 
-# Main Interaction Loop
-if 'current_rec' not in st.session_state:
-    # First run initialization
-    rec_id, _ = get_recommendation()
-    st.session_state.current_rec = rec_id
+    st.subheader("Recent Articles")
+    for nid in reversed(st.session_state.history[-5:]):
+        st.caption("• " + news_df.loc[nid]["title"][:50])
 
-# Display the Current Article
-rec_id = st.session_state.current_rec
-try:
-    article = news_df.loc[rec_id]
-    
-    st.divider()
-    st.subheader(article['title'])
-    st.info(f"Category: {article['category']}")
-    st.write(article['abstract'])
-    st.divider()
-    
-    col1, col2 = st.columns(2)
-    
-    def on_click(clicked):
-        st.session_state.impressions += 1
-        if clicked:
-            st.session_state.clicks += 1
-            st.session_state.history.append(rec_id)
-            st.toast("Updated User Profile! 🧠")
-        
-        # Get NEXT recommendation
-        next_id, _ = get_recommendation()
-        st.session_state.current_rec = next_id
-
-    with col1:
-        st.button("📖 Read Article", on_click=on_click, args=(True,), use_container_width=True, type="primary")
-    with col2:
-        st.button("⏭️ Skip", on_click=on_click, args=(False,), use_container_width=True)
-
-except KeyError:
-    st.error("Error loading article metadata. Try refreshing.")
-    # Reset if stuck
-    next_id, _ = get_recommendation()
-    st.session_state.current_rec = next_id
+    # Optional small chart
+    st.subheader("Category Distribution")
+    if len(st.session_state.history) > 0:
+        hist_df = news_df.loc[st.session_state.history]
+        pie = hist_df["category"].value_counts()
+        st.pyplot(pie.plot(kind='pie', autopct='%1.1f%%').figure)
