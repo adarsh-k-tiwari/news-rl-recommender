@@ -250,7 +250,6 @@ data/processed/
 
 ### Multi-Category Support
 - Automatically detects user's preferred categories
-- Round-robin selection ensures equal representation
 - Configurable through simulation panel
 - Works with any combination of categories (e.g., `sports,news`, `foodanddrink,tv`)
 
