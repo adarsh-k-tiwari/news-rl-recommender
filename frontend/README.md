@@ -41,7 +41,7 @@ The built files will be in the `dist` directory.
 - **Axios** - HTTP client
 - **Lucide React** - Icons
 
-## Project Structur
+## Project Structure For the Frontend Part
 
 ```
 frontend/
