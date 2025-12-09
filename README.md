@@ -93,9 +93,6 @@ news-rl-recommender/
 ```
 
 ## Running the Interactive Application
-
-### Method 1: Manual Start
-
 1. **Start the Backend API:**
    ```bash
    # Make sure virtual environment is activated
