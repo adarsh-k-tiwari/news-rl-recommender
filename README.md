@@ -92,23 +92,7 @@ news-rl-recommender/
 └── tests/            # Unit tests
 ```
 
-## Running the Application
-
-### Method 1: Using Batch Scripts (Windows - Recommended)
-
-1. **Start Backend:**
-   ```bash
-   start_backend.bat
-   ```
-
-2. **Start Frontend (in a new terminal):**
-   ```bash
-   start_frontend.bat
-   ```
-
-3. **Access the Application:**
-   - Open browser to `http://localhost:5173`
-   - Backend API runs on `http://localhost:5000`
+## Running the Interactive Application
 
 ### Method 2: Manual Start
 
