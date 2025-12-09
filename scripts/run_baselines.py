@@ -1,4 +1,6 @@
-# run_baselines.py
+"""
+Script to run and evaluate agents on the MINDRecEnv environment
+"""
 
 import numpy as np
 import torch
@@ -20,7 +22,7 @@ def evaluate_agent(agent, env, num_episodes=100):
         state = env.reset()
         done = False
         while not done:
-            # Pass env to predict because Popularity/Supervised need candidate access
+            # Get Action
             action = agent.predict(state, env)
             next_state, reward, done, info = env.step(action)
             
@@ -35,18 +37,17 @@ def main():
     # Initialize Env
     env = MINDRecEnv(data_dir='data/processed', split='dev', max_candidate_size=100)
     
-    # # 1. Evaluate Random
-    # random_agent = RandomAgent(env.action_space)
-    # ctr_rand, _ = evaluate_agent(random_agent, env, num_episodes=500)
-    # print(f"Random Agent CTR: {ctr_rand:.4f}")
+    # 1. Evaluate Random
+    random_agent = RandomAgent(env.action_space)
+    ctr_rand, _ = evaluate_agent(random_agent, env, num_episodes=500)
+    print(f"Random Agent CTR: {ctr_rand:.4f}")
     
-    # # 2. Evaluate Popularity
-    # pop_agent = PopularityAgent('data/processed/sessions/train_sessions.pkl')
-    # ctr_pop, _ = evaluate_agent(pop_agent, env, num_episodes=500)
-    # print(f"Popularity Agent CTR: {ctr_pop:.4f}")
+    # 2. Evaluate Popularity
+    pop_agent = PopularityAgent('data/processed/sessions/train_sessions.pkl')
+    ctr_pop, _ = evaluate_agent(pop_agent, env, num_episodes=500)
+    print(f"Popularity Agent CTR: {ctr_pop:.4f}")
     
-    # # 3. Evaluate Supervised
-    # Load model
+    # 3. Evaluate Supervised
     model = ClickPredictor(state_dim=391, article_emb_dim=384)
     model.load_state_dict(torch.load('data/processed/supervised_model.pth'))
     
@@ -55,28 +56,28 @@ def main():
     print(f"Supervised Agent CTR: {ctr_sup:.4f}")
 
     # 4. Evaluate DQN
-    # dqn_agent = DQNAgent(state_dim=391, article_emb_dim=384)
-    # dqn_agent.policy_net.load_state_dict(torch.load('data/processed/dqn_model.pth'))
-    # ctr_dqn, _ = evaluate_agent(dqn_agent, env, num_episodes=500)
-    # print(f"DQN Agent CTR: {ctr_dqn:.4f}")
+    dqn_agent = DQNAgent(state_dim=391, article_emb_dim=384)
+    dqn_agent.policy_net.load_state_dict(torch.load('data/processed/dqn_model.pth'))
+    ctr_dqn, _ = evaluate_agent(dqn_agent, env, num_episodes=500)
+    print(f"DQN Agent CTR: {ctr_dqn:.4f}")
 
-    # # 5. Evaluate CMAB
-    # cmab_agent = CMABAgent(state_dim=391, article_emb_dim=384)
-    # cmab_agent.net.load_state_dict(torch.load('data/processed/cmab_model.pth'))
-    # ctr_cmab, _ = evaluate_agent(cmab_agent, env, num_episodes=500)
-    # print(f"CMAB Agent CTR: {ctr_cmab:.4f}")
+    # 5. Evaluate CMAB
+    cmab_agent = CMABAgent(state_dim=391, article_emb_dim=384)
+    cmab_agent.net.load_state_dict(torch.load('data/processed/cmab_model.pth'))
+    ctr_cmab, _ = evaluate_agent(cmab_agent, env, num_episodes=500)
+    print(f"CMAB Agent CTR: {ctr_cmab:.4f}")
 
     # 6. Deuling DQN
-    # ddqn_agent = DuelingDQNAgent(state_dim=391, article_emb_dim=384)
-    # ddqn_agent.policy_net.load_state_dict(torch.load('data/processed/dueling_dqn_model.pth'))
-    # ctr_ddqn, _ = evaluate_agent(ddqn_agent, env, num_episodes=500)
-    # print(f"Dueling DQN Agent CTR: {ctr_ddqn:.4f}")
+    ddqn_agent = DuelingDQNAgent(state_dim=391, article_emb_dim=384)
+    ddqn_agent.policy_net.load_state_dict(torch.load('data/processed/dueling_dqn_model.pth'))
+    ctr_ddqn, _ = evaluate_agent(ddqn_agent, env, num_episodes=500)
+    print(f"Dueling DQN Agent CTR: {ctr_ddqn:.4f}")
 
-    # # 7. Evaluate SAC
-    # sac_agent = SACAgent(state_dim=391, article_emb_dim=384)
-    # sac_agent.policy.load_state_dict(torch.load('data/processed/sac_model.pth'))
-    # ctr_sac, _ = evaluate_agent(sac_agent, env, num_episodes=500)
-    # print(f"SAC Agent CTR: {ctr_sac:.4f}")
+    # 7. Evaluate SAC
+    sac_agent = SACAgent(state_dim=391, article_emb_dim=384)
+    sac_agent.policy.load_state_dict(torch.load('data/processed/sac_model.pth'))
+    ctr_sac, _ = evaluate_agent(sac_agent, env, num_episodes=500)
+    print(f"SAC Agent CTR: {ctr_sac:.4f}")
 
 if __name__ == "__main__":
     main()

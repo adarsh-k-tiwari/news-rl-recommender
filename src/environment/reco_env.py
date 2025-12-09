@@ -1,4 +1,6 @@
-# src/environment/reco_env.py
+"""
+Gym environment for personalized news recommendation using MIND dataset.
+"""
 
 import gym
 from gym import spaces

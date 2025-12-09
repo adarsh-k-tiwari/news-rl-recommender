@@ -1,5 +1,7 @@
-# src/models/train_supervised.py
-
+"""
+Baseline supervised training script for click prediction model
+Trains ClickPredictor on sessions to predict click probabilities
+"""
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -22,7 +24,7 @@ def train_supervised_baseline():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Using device: {device}")
     
-    print("Loading Encoders...")
+    print("Loading Encoders")
     # 1. Article Encoder
     article_encoder = ArticleEncoder(
         embedding_dim=384, 
@@ -36,14 +38,14 @@ def train_supervised_baseline():
         aggregation_method='mean'
     )
 
-    # 3. State Builder (Required since preprocess skipped state computation)
+    # 3. State Builder
     state_builder = StateBuilder(
         article_encoder=article_encoder,
         user_encoder=user_encoder,
         embedding_dim=384
     )
     
-    print("Loading Training Sessions...")
+    print("Loading Training Sessions")
     session_path = data_dir / 'sessions/train_sessions.pkl'
     if not session_path.exists():
         raise FileNotFoundError(f"Could not find {session_path}")
@@ -52,8 +54,7 @@ def train_supervised_baseline():
         sessions = pickle.load(f)
     
     # Create Dataset 
-    # Pass state_builder to calculate states on-the-fly
-    print("Creating Dataset...")
+    print("Creating Dataset")
     dataset = SupervisedDataset(
         sessions, 
         article_encoder, 
@@ -73,7 +74,7 @@ def train_supervised_baseline():
     criterion = nn.BCELoss()
     
     # Training Loop
-    print(f"Starting Training on {len(dataset)} samples...")
+    print(f"Starting Training on {len(dataset)} samples")
     model.train()
     for epoch in range(5):
         total_loss = 0

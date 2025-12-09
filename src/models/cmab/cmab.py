@@ -1,5 +1,9 @@
-# src/models/cmab.py
-
+"""
+Neural Contextual Bandit Agent for Recommendation
+Includes:
+1. CMABAgent: Implements a NeuralUCB / Epsilon-Greedy style bandit agent.
+2. RewardPredictor: Neural network to estimate reward for (state, action)
+"""
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -93,8 +97,6 @@ class CMABAgent:
         # Forward pass
         pred_rewards = self.net(states, action_embs)
         
-        # Loss: Minimize difference between predicted and actual reward
-        # Note: We only train on the action we actually took (Bandit Feedback)
         loss = self.loss_fn(pred_rewards, rewards)
         
         self.optimizer.zero_grad()

@@ -32,55 +32,46 @@ def parse_args():
     parser.add_argument(
         '--data_root',
         type=str,
-        default='data/raw',
-        help='Root directory containing train/dev/test folders'
+        default='data/raw'
     )
     parser.add_argument(
         '--output_dir',
         type=str,
-        default='data/processed',
-        help='Output directory for processed data'
+        default='data/processed'
     )
     parser.add_argument(
         '--splits',
         nargs='+',
         choices=['train', 'dev', 'test'],
-        default=['train', 'dev'],
-        help='Which splits to process (default: train dev)'
+        default=['train', 'dev']
     )
     parser.add_argument(
         '--nrows',
         type=int,
-        default=None,
-        help='Number of behavior rows to process per split (None for all)'
+        default=None
     )
     parser.add_argument(
         '--embedding_model',
         type=str,
-        default='sentence-transformers/all-MiniLM-L6-v2',
-        help='HuggingFace model for embeddings'
+        default='sentence-transformers/all-MiniLM-L6-v2'
     )
     parser.add_argument(
         '--embedding_dim',
         type=int,
-        default=384,
-        help='Embedding dimension'
+        default=384
     )
     parser.add_argument(
         '--batch_size',
         type=int,
-        default=32,
-        help='Batch size for encoding'
+        default=32
     )
     parser.add_argument(
         '--skip_state_computation',
-        action='store_true',
-        help='Skip state computation during preprocessing (compute during training instead)'
+        action='store_true'
     )
     parser.add_argument(
         '--skip_embeddings',
-        action='store_true',
-        help='Skip embedding generation (use existing cache)'
+        action='store_true'
     )
     
     return parser.parse_args()
@@ -113,7 +104,7 @@ def encode_all_articles(loaders, encoder, batch_size=32):
     Returns:
         Dictionary mapping news_id to embedding
     """
-    logger.info("Collecting unique articles across all splits...")
+    logger.info("Collecting unique articles across all splits")
     
     # Combine all news articles (remove duplicates based on news_id)
     all_news = []
@@ -140,7 +131,7 @@ def encode_all_articles(loaders, encoder, batch_size=32):
 
 def create_category_encoder(loaders, output_dir):
     """Create and save category encoder from all splits."""
-    logger.info("Creating category encoder...")
+    logger.info("Creating category encoder")
     
     # Collect all unique categories
     all_categories = set()
@@ -185,14 +176,14 @@ def process_sessions_for_split(
     Returns:
         List of processed sessions
     """
-    logger.info(f"Processing {split_name} sessions (optimized)...")
+    logger.info(f"Processing {split_name} sessions (optimized)")
     logger.info(f"Total impressions to process: {len(loader.behaviors_df)}")
     
     if skip_state_computation:
         logger.info("Fast mode: Skipping state computation")
     
     # Parse all behaviors at once
-    logger.info("Parsing impression data...")
+    logger.info("Parsing impression data")
     loader.behaviors_df['history_list'] = loader.behaviors_df['history'].apply(
         loader.parse_history
     )
@@ -201,7 +192,7 @@ def process_sessions_for_split(
     )
     
     # Group by user
-    logger.info("Grouping by user...")
+    logger.info("Grouping by user")
     grouped = loader.behaviors_df.groupby('user_id')
     
     # Process each user's impressions
@@ -267,7 +258,7 @@ def process_sessions_for_split(
 
 def generate_statistics(loaders, all_sessions, output_dir):
     """Generate and save dataset statistics for all splits."""
-    logger.info("Generating statistics...")
+    logger.info("Generating statistics")
     
     stats = {}
     
@@ -356,13 +347,13 @@ def main():
     create_directory_structure(output_dir)
     
     # Load data for each split
-    logger.info("Loading data from all splits...")
+    logger.info("Loading data from all splits")
     loaders = {}
     
     for split_name in args.splits:
         split_dir = data_root / split_name
         if not split_dir.exists():
-            logger.warning(f"Directory not found: {split_dir}, skipping...")
+            logger.warning(f"Directory not found: {split_dir}, skipping")
             continue
         
         logger.info(f"Loading {split_name} data from {split_dir}")
@@ -374,7 +365,7 @@ def main():
         raise ValueError("No data loaded! Check your data directories.")
     
     # Initialize encoders
-    logger.info("Initializing encoders...")
+    logger.info("Initializing encoders")
     
     article_encoder = ArticleEncoder(
         model_name=args.embedding_model,

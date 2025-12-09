@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Simulation script to generate many interactions against the local recommendation API.
 

@@ -6,7 +6,7 @@ This guide will help you set up and run the interactive React.js interface for y
 
 - Python 3.8+
 - Node.js 18+ and npm
-- Trained RL models (at least one of: supervised_model.pth, dqn_model.pth, dueling_dqn_model.pth)
+- Trained RL models (at least one of: supervised_model.pth, dqn_model.pth, dueling_dqn_model.pth, cmab_model.pth, sac_model.pth)
 
 ## Backend Setup
 
@@ -19,6 +19,8 @@ pip install -r requirements.txt
    - `supervised_model.pth`
    - `dqn_model.pth` 
    - `dueling_dqn_model.pth` 
+   - `cmab_model.pth`
+   - `sac_model.pth`
 
 3. Start the Flask API server:
 ```bash
@@ -89,4 +91,3 @@ The backend provides the following endpoints:
 - `GET /api/metrics/<user_id>` - Get user metrics
 - `GET /api/categories` - Get all categories
 - `GET /api/article/<news_id>` - Get article details
-

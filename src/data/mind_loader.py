@@ -61,7 +61,7 @@ class MINDDataLoader:
         
         self.news_df = None
         self.behaviors_df = None
-        self.news_dict = {}  # For fast lookup: news_id -> NewsArticle
+        self.news_dict = {} # news_id -> NewsArticle
         
         logger.info(f"Initialized MINDDataLoader for {dataset_type} data at {data_dir}")
     
@@ -337,7 +337,6 @@ class MINDDataLoader:
         logger.info("All data loaded successfully")
 
 
-# Example usage
 if __name__ == "__main__":
     # Initialize loader
     loader = MINDDataLoader(
@@ -345,8 +344,8 @@ if __name__ == "__main__":
         dataset_type='train'
     )
     
-    # Load data
-    loader.load_all(nrows=10000)  # Load first 10k behaviors for testing
+     # Load first 10k behaviors for testing
+    loader.load_all(nrows=10000) 
     
     # Get statistics
     news_stats = {

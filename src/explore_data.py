@@ -26,8 +26,8 @@ def plot_category_distribution(loader):
     plt.ylabel('Number of Articles')
     plt.title('Top 15 News Categories')
     plt.tight_layout()
-    plt.savefig('results/figures/category_distribution.png', dpi=300, bbox_inches='tight')
-    print("Saved: results/figures/category_distribution.png")
+    plt.savefig('result/figures/category_distribution.png', dpi=300, bbox_inches='tight')
+    print("Saved: result/figures/category_distribution.png")
 
 def plot_user_engagement(loader):
     """Plot user engagement metrics"""
@@ -81,8 +81,8 @@ def plot_user_engagement(loader):
     axes[1, 1].set_title('Cold Start vs Warm Start Users')
     
     plt.tight_layout()
-    plt.savefig('results/figures/user_engagement.png', dpi=300, bbox_inches='tight')
-    print("Saved: results/figures/user_engagement.png")
+    plt.savefig('result/figures/user_engagement.png', dpi=300, bbox_inches='tight')
+    print("Saved: result/figures/user_engagement.png")
 
 def plot_temporal_patterns(loader):
     """Plot temporal patterns in the data"""
@@ -114,8 +114,8 @@ def plot_temporal_patterns(loader):
     axes[1].set_title('Impressions by Day of Week')
     
     plt.tight_layout()
-    plt.savefig('results/figures/temporal_patterns.png', dpi=300, bbox_inches='tight')
-    print("Saved: results/figures/temporal_patterns.png")
+    plt.savefig('result/figures/temporal_patterns.png', dpi=300, bbox_inches='tight')
+    print("Saved: result/figures/temporal_patterns.png")
 
 def analyze_click_patterns(loader):
     """Analyze and visualize click patterns"""
@@ -148,8 +148,8 @@ def analyze_click_patterns(loader):
     plt.ylabel('Number of Clicks')
     plt.title('Top 10 Most Clicked Categories')
     plt.tight_layout()
-    plt.savefig('results/figures/clicked_categories.png', dpi=300, bbox_inches='tight')
-    print("Saved: results/figures/clicked_categories.png")
+    plt.savefig('result/figures/clicked_categories.png', dpi=300, bbox_inches='tight')
+    print("Saved: result/figures/clicked_categories.png")
     
     return click_counts, cat_counts
 
@@ -172,7 +172,7 @@ def main():
     loader = MINDDataLoader(data_dir=args.data_dir, dataset_type='train')
     
     # Load data
-    print("\nLoading data...")
+    print("\nLoading data")
     loader.load_all(nrows=args.nrows)
     
     # Get statistics
@@ -230,9 +230,9 @@ def main():
         print("="*80)
         
         import os
-        os.makedirs('results/figures', exist_ok=True)
+        os.makedirs('result/figures', exist_ok=True)
         
-        print("\nGenerating plots...")
+        print("\nGenerating plots")
         plot_category_distribution(loader)
         plot_user_engagement(loader)
         plot_temporal_patterns(loader)

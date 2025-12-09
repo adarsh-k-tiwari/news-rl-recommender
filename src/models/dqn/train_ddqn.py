@@ -1,5 +1,7 @@
-# scripts/train_dqn.py
-
+"""
+Dueling Deep Q-Network (DDQN) Training Script for News Recommendation
+Implements training loop for DDQN agent using MINDRecEnv environment
+"""
 import torch
 import numpy as np
 from tqdm import tqdm
@@ -16,7 +18,6 @@ def train_ddqn():
     print(f"Training on {device}")
     
     # Initialize Environment
-    # We use 'train' split for training interactions
     env = MINDRecEnv(data_dir=data_dir, split='train', max_candidate_size=100)
     
     # Initialize Agent
@@ -56,9 +57,6 @@ def train_ddqn():
             next_state, reward, done, info = env.step(action_idx)
             
             # 3. Store Transition
-            # Important: We need the NEXT candidates for the Bellman update
-            # Since env.step() advances the index, env.get_candidate_embeddings()
-            # NOW returns the candidates for next_state.
             next_candidates = env.get_candidate_embeddings()
             
             agent.memory.push(state, action_emb, reward, next_state, next_candidates, done)

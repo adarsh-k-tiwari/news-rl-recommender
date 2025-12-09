@@ -1,4 +1,6 @@
-
+"""
+Article Encoder Module
+"""
 import torch
 import torch.nn as nn
 from transformers import AutoTokenizer, AutoModel
@@ -145,7 +147,7 @@ class ArticleEncoder:
             logger.info("All articles already cached")
             return embeddings
         
-        logger.info(f"Encoding {len(texts_to_encode)} new articles...")
+        logger.info(f"Encoding {len(texts_to_encode)} new articles")
         
         # Encode in batches
         iterator = range(0, len(texts_to_encode), batch_size)
@@ -247,19 +249,18 @@ class CategoryEncoder:
         return embeddings.numpy()
 
 
-# Example usage
 if __name__ == "__main__":
     import sys
     sys.path.append('.')
     from src.data.mind_loader import MINDDataLoader
     
     # Load data
-    print("Loading MIND data...")
+    print("Loading MIND data")
     loader = MINDDataLoader(data_dir='data/raw/train', dataset_type='train')
     loader.load_news()
     
     # Initialize encoder
-    print("\nInitializing article encoder...")
+    print("\nInitializing article encoder")
     encoder = ArticleEncoder(
         model_name='sentence-transformers/all-MiniLM-L6-v2',
         embedding_dim=384,
@@ -267,7 +268,7 @@ if __name__ == "__main__":
     )
     
     # Encode all articles
-    print("\nEncoding articles...")
+    print("\nEncoding articles")
     embeddings = encoder.encode_from_dataframe(loader.news_df.head(100), batch_size=32)
     
     print(f"\nEncoded {len(embeddings)} articles")

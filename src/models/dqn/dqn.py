@@ -1,5 +1,8 @@
-# src/models/dqn.py
-
+"""
+Deep Q-Network (DQN) Agent for News Recommendation.
+Implements:
+- DQN architecture with separate Value and Advantage streams.
+"""
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -52,8 +55,8 @@ class DQNAgent:
         state_dim, 
         article_emb_dim, 
         learning_rate=1e-4, 
-        gamma=0.95,          # Discount factor for future rewards
-        epsilon_start=1.0,   # Exploration rate
+        gamma=0.95,          
+        epsilon_start=1.0,   
         epsilon_end=0.20,
         epsilon_decay=0.995,
 

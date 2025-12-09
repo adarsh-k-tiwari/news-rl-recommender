@@ -1,5 +1,6 @@
-# src/evaluation/metrics.py
-
+"""
+Evaluation Metrics for News Recommendation Systems
+"""
 import numpy as np
 import pandas as pd
 from typing import List, Dict, Set
@@ -12,25 +13,19 @@ class RecommenderMetrics:
         """
         Args:
             news_df: DataFrame containing 'news_id', 'category', 'published_date' (if avail)
-            article_encoder: Your ArticleEncoder instance
+            article_encoder: ArticleEncoder instance
         """
         self.news_df = news_df.set_index('news_id') if 'news_id' in news_df.columns else news_df
         self.article_encoder = article_encoder
         
         # Pre-cache all embeddings for the catalog for fast lookup
-        # (Assuming article_encoder has a cache or can get them)
         all_ids = self.news_df.index.tolist()
         self.all_embeddings = self.article_encoder.get_embeddings(all_ids)
         self.id_to_idx = {news_id: i for i, news_id in enumerate(all_ids)}
         
-        # Parse Timestamps for Novelty
-        # MIND format example: "11/11/2019 10:00:00 AM" (or similar)
-        # We will try to parse, fallback to 0 if fails
         self.timestamps = {}
         for news_id, row in self.news_df.iterrows():
             try:
-                # Adjust format based on your actual data column name and format
-                # Using a generic pandas parser for safety
                 if 'published_date' in row:
                     ts = pd.to_datetime(row['published_date']).timestamp()
                     self.timestamps[news_id] = ts
@@ -39,7 +34,7 @@ class RecommenderMetrics:
             except:
                 self.timestamps[news_id] = 0.0
 
-    # ==================== ACCURACY ====================
+    #  ACCURACY 
     def calculate_ctr(self, recommendations: List[str], clicks: List[str]) -> float:
         if not recommendations: return 0.0
         click_set = set(clicks)
@@ -65,7 +60,7 @@ class RecommenderMetrics:
         
         return dcg / idcg if idcg > 0 else 0.0
 
-    # ==================== DIVERSITY ====================
+    #  DIVERSITY 
     def calculate_ild(self, recommendations: List[str]) -> float:
         """Intra-List Diversity (1 - Cosine Similarity)"""
         valid_recs = [r for r in recommendations if r in self.id_to_idx]
@@ -100,7 +95,7 @@ class RecommenderMetrics:
         # Entropy
         return -np.sum(probs * np.log2(probs + 1e-9))
 
-    # ==================== NOVELTY ====================
+    #  NOVELTY 
     def calculate_novelty(self, recommendations: List[str]) -> float:
         """Mean Inverse Popularity (or Recency)"""
         # Since we don't have live popularity counts in this class, 
@@ -117,9 +112,7 @@ class RecommenderMetrics:
                 age_hours = (now - pub_ts) / 3600
                 ages.append(age_hours)
                 
-        # Lower age is "more novel" in news
-        # But usually Novelty = -log(prob). 
-        # Here we return Mean Age (Lower is fresher/more novel)
+        # Lower age is "more novel" in news, but usually Novelty = -log(prob). Here we return Mean Age (Lower is fresher/more novel)
         if not ages: return 0.0
         return np.mean(ages)
 

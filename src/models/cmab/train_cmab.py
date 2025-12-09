@@ -1,3 +1,7 @@
+"""
+CMAB Training Script for News Recommendation
+Trains a Neural Contextual Bandit agent using epsilon-greedy strategy
+"""
 import torch
 import numpy as np
 from tqdm import tqdm
@@ -17,13 +21,12 @@ def train_cmab():
     env = MINDRecEnv(data_dir=data_dir, split='train', max_candidate_size=100)
     
     # Initialize Agent
-    # Note: CMAB doesn't need a target network or gamma
     agent = CMABAgent(
         state_dim=391,
         article_emb_dim=384,
         device=device,
         buffer_size=50000,
-        epsilon=0.1 # Constant small exploration is common for Bandits
+        epsilon=0.1 # 10% exploration
     )
     
     num_episodes = 10000
@@ -48,7 +51,7 @@ def train_cmab():
             # 2. Step Environment
             next_state, reward, done, info = env.step(action_idx)
             
-            # 3. Store Transition (Bandit only needs: State, Action, Reward)
+            # 3. Store Transition
             agent.push_memory(state, action_emb, reward)
             
             # 4. Train

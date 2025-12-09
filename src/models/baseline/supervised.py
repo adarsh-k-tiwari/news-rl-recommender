@@ -1,4 +1,10 @@
-# src/models/supervised.py
+"""
+Supervised learning model for news recommendation
+Includes:
+1. ClickPredictor: Feed-Forward Network to predict click probabilities
+2. SupervisedDataset: Dataset class to create training samples from sessions
+3. SupervisedAgent: Wraps the trained model for action selection
+"""
 
 import torch
 import torch.nn as nn
@@ -41,7 +47,7 @@ class SupervisedDataset(Dataset):
         count = 0
         skipped_no_state = 0
         
-        logger.info(f"Building dataset from {len(sessions)} sessions...")
+        logger.info(f"Building dataset from {len(sessions)} sessions")
         
         for session in sessions:
             # Track session stats for on-the-fly state building

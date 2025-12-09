@@ -321,7 +321,6 @@ class UserProfileBuilder:
         return np.concatenate(features)
 
 
-# Example usage
 if __name__ == "__main__":
     import sys
     sys.path.append('.')
@@ -332,7 +331,7 @@ if __name__ == "__main__":
     
     history_embeddings = np.random.randn(history_length, embedding_dim).astype(np.float32)
     
-    print("Testing different aggregation methods...")
+    print("Testing different aggregation methods")
     
     # Test mean aggregation
     encoder_mean = UserEncoder(embedding_dim, aggregation_method='mean')

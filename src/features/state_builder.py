@@ -374,7 +374,6 @@ class FeatureNormalizer:
         return features * self.std + self.mean
 
 
-# Example usage
 if __name__ == "__main__":
     import sys
     sys.path.append('.')
@@ -383,11 +382,11 @@ if __name__ == "__main__":
     from src.data.mind_loader import MINDDataLoader
     from datetime import datetime
     
-    print("Loading data...")
+    print("Loading data")
     loader = MINDDataLoader('data/raw/train', 'train')
     loader.load_all(nrows=1000)
     
-    print("\nInitializing encoders...")
+    print("\nInitializing encoders")
     article_encoder = ArticleEncoder(
         model_name='sentence-transformers/all-MiniLM-L6-v2',
         embedding_dim=384,
@@ -402,7 +401,7 @@ if __name__ == "__main__":
         aggregation_method='mean'
     )
     
-    print("\nInitializing state builder...")
+    print("\nInitializing state builder")
     state_builder = StateBuilder(
         article_encoder=article_encoder,
         user_encoder=user_encoder,

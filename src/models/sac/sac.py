@@ -1,5 +1,6 @@
-# src/models/sac/sac.py (or src/models/sac.py depending on your structure)
-
+"""
+Soft Actor-Critic (SAC) implementation for recommendation environment
+"""
 import torch
 import torch.nn as nn
 import torch.optim as optim

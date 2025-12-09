@@ -1,5 +1,9 @@
-# scripts/evaluate_final.py
-
+"""
+Final Evaluation Script for Recommender System Agents
+This script evaluates various recommender system agents (baselines and trained models)
+on a common evaluation environment using multiple metrics including accuracy and diversity
+Results are saved to a CSV file and visualized in a plot
+"""
 import torch
 import pandas as pd
 import numpy as np
@@ -39,12 +43,11 @@ def run_evaluation_loop(agent, env, metrics_calc, num_episodes=500, name="Agent"
         total_reward = 0
         
         while not done:
-            # 1. Get Action (Handle different agent interfaces)
+            # 1. Get Action
             candidates = env.get_candidate_embeddings()
             candidate_ids = env.current_candidates # List of news_ids
             
             if name == "Random":
-                # Random agent samples fixed space (0-99), need to clamp to actual size
                 action = agent.predict(state)
                 if action >= len(candidate_ids):
                     action = np.random.randint(0, len(candidate_ids))
@@ -54,8 +57,6 @@ def run_evaluation_loop(agent, env, metrics_calc, num_episodes=500, name="Agent"
                 # RL Agents
                 action, _ = agent.select_action(state, candidates, eval_mode=True)
             
-            # --- SAFETY CHECK (The Fix) ---
-            # Ensure action is within bounds of the current candidate list
             if action >= len(candidate_ids):
                 action = 0 
             
@@ -83,7 +84,6 @@ def run_evaluation_loop(agent, env, metrics_calc, num_episodes=500, name="Agent"
     ndcgs = [metrics_calc.calculate_ndcg(r, c) for r, c in zip(all_recs, all_clicks)]
     
     # 2. Diversity
-    # Calculate ILD for every session and average
     ilds = [metrics_calc.calculate_ild(r) for r in all_recs]
     cat_divs = [metrics_calc.calculate_category_diversity(r) for r in all_recs]
     
@@ -102,14 +102,10 @@ def run_evaluation_loop(agent, env, metrics_calc, num_episodes=500, name="Agent"
 def main():
     data_dir = 'data/processed'
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print(f"Running Final Evaluation on {device}...")
+    print(f"Running Final Evaluation on {device}")
     
     # 1. Setup Env & Metrics
     env = MINDRecEnv(data_dir=data_dir, split='dev', max_candidate_size=100)
-    
-    # Need to load the News DataFrame for the Metrics Class
-    # (Assuming we can get it via the environment or loader)
-    # For now, we trick it by loading the simulated one or real one
     from src.data.mind_loader import MINDDataLoader
     loader = MINDDataLoader(data_dir='data/raw/dev', dataset_type='dev')
     loader.load_news() # Populates loader.news_df
@@ -171,8 +167,8 @@ def main():
     print("="*50)
     print(df)
     
-    df.to_csv('final_metrics.csv')
-    print("\nSaved to final_metrics.csv")
+    df.to_csv('result/final_metrics.csv')
+    print("\nSaved to result/final_metrics.csv")
     
     # 5. Spider Plot (Radar Chart) for visual comparison
     # Normalize columns for the chart 0-1
@@ -182,7 +178,7 @@ def main():
     df[['CTR', 'Diversity (ILD)', 'NDCG@10']].plot(kind='bar', figsize=(12, 6))
     plt.title("Model Performance across Metrics")
     plt.tight_layout()
-    plt.savefig('final_metrics_plot.png')
+    plt.savefig('result/final_metrics_plot.png')
 
 if __name__ == "__main__":
     main()

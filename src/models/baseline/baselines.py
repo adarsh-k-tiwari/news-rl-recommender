@@ -1,5 +1,9 @@
-# src/models/baselines.py
-
+"""
+Baseline agents for news recommendation.
+Includes:
+1. RandomAgent: selects articles randomly.
+2. PopularityAgent: selects articles based on global popularity.
+"""
 import numpy as np
 import pickle
 from typing import Dict, List
@@ -55,7 +59,6 @@ class PopularityAgent:
         """
         candidates = env.current_candidates
         
-        # specific to your env implementation where candidates are news_ids
         best_score = -1
         best_action = 0
         

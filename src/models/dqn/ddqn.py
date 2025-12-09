@@ -1,5 +1,9 @@
-# src/models/dqn.py
-
+"""
+Dueling Double Deep Q-Network (D3QN) Agent for News Recommendation.
+Implements:
+- Dueling DQN architecture with separate Value and Advantage streams.
+- Double DQN update to reduce overestimation bias.
+"""
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -39,27 +43,14 @@ class DuelingDQNetwork(nn.Module):
         )
         
     def forward(self, state, article_emb):
-        # Value calculation (Uses only State)
-        # Note: state input might need to be separated if batched with article_emb
-        # Assuming inputs are correctly aligned tensors
-        
+        # Value calculation (Uses State only)
         V = self.value_stream(state)
         
         # Advantage calculation (Uses State + Action)
         x_adv = torch.cat([state, article_emb], dim=1)
         A = self.advantage_stream(x_adv)
         
-        # Combine: Q(s,a) = V(s) + A(s,a) - mean(A)
-        # However, calculating mean(A) depends on having ALL actions for that state.
-        # For standard "Forward" where we process a batch of (s,a) pairs, 
-        # we often use the simplified Q = V + A - mean(A) across the batch dimension 
-        # OR just Q = V + A (naive dueling) if candidates aren't grouped.
-        
-        # Correct implementation for RecSys (Evaluating K candidates for 1 user):
-        # We usually rely on the Agent to handle the mean subtraction or 
-        # just implement the standard V + (A - A.mean()) assuming the batch represents the candidate set.
-        
-        # For simplicity in this implementation (standard Dueling formula):
+        # Combine Value and Advantage to get Q-value    
         return V + (A - A.mean(dim=0, keepdim=True))
 
 class ReplayBuffer:
@@ -142,7 +133,6 @@ class DuelingDQNAgent:
         transitions = self.memory.sample(batch_size)
         
         # Unpack batch
-        # Note: 'next_candidates' is a list of arrays, one for each sample in batch
         states, action_embs, rewards, next_states, next_candidates_list, dones = zip(*transitions)
         
         states = torch.FloatTensor(np.array(states)).to(self.device)
@@ -155,8 +145,6 @@ class DuelingDQNAgent:
         current_q_values = self.policy_net(states, action_embs)
         
         # 2. Compute Max Q(s', a') for target
-        # This is tricky because each sample has a DIFFERENT set of candidates.
-        # We must process them one by one or pad them. Loop is easier for this scale.
         next_max_q = []
         
         with torch.no_grad():

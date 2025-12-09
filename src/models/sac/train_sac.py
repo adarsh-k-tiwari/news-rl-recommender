@@ -1,3 +1,6 @@
+"""
+SAC Training Script for News Recommendation Environment
+"""
 import torch
 import numpy as np
 from tqdm import tqdm
@@ -29,7 +32,7 @@ def train_sac():
     
     rewards_history = []
     
-    print(f"Starting SAC Training for {num_episodes} episodes...")
+    print(f"Starting SAC Training for {num_episodes} episodes")
     
     for episode in tqdm(range(num_episodes), desc="Training"):
         state = env.reset()
@@ -41,7 +44,7 @@ def train_sac():
             candidates = env.get_candidate_embeddings()
             action_idx, action_emb = agent.select_action(state, candidates)
             
-            # 2. Step
+            # 2. Next Step
             next_state, reward, done, info = env.step(action_idx)
             
             # 3. Store
