@@ -72,10 +72,10 @@ pip install -r requirements.txt
 ```
 
 ### 3. Using pre-trained models
-1. Download the full `data.zip` folder from our [Google Drive](https://drive.google.com/drive/folders/1hkcqKRMCE3AxIjfW7kCSCftYD3PdLvYy?usp=sharing)
-2. Delete your existing data/ folder in the project root
-3. Extract the downloaded zip file so that the new data/ folder replaces it
-4. This folder contains all processed embeddings and trained .pth model files
+- Download the full `data.zip` folder from our [Google Drive](https://drive.google.com/drive/folders/1hkcqKRMCE3AxIjfW7kCSCftYD3PdLvYy?usp=sharing)
+- Delete your existing data/ folder in the project root
+- Extract the downloaded zip file so that the new data/ folder replaces it
+- This folder contains all processed embeddings and trained .pth model files
 
 ### 4. Model Evaluation
 Generate a comparative report of all trained models (Random, Popularity, Supervised, DQN, CMAB, SAC).
@@ -148,6 +148,56 @@ Read Setup.md first to setup React and Necessary Libraries in system.
 - **Recent Rewards:** Tracks model performance over last 20 interactions
 
 ## Technical Architecture
+A key design choice in this project was to maintain a **consistent neural network backbone** across all agents. This ensures that performance differences are attributable to the algorithmic strategy (Bandit vs. RL vs. Entropy) rather than model capacity.
+
+### 1. Common Input Layer
+All agents utilize the same feature fusion strategy before passing data to the neural network.
+
+* **State Input:** 391 dimensions (User Embedding + Context Features)
+* **Action Input:** 384 dimensions (Article BERT Embedding)
+* **Fusion Strategy:** Concatenation (`State || Action`)
+* **Total Input Dimensions:** **775** (391 + 384)
+
+---
+
+### 2. Agent-Specific Architectures
+
+#### A. Contextual Multi-Armed Bandit (CMAB)
+* **Role:** The "Greedy" Baseline.
+* **Network Type:** Reward Predictor (approximates R(s,a)).
+* **Key Mechanic:** Discount factor gamma = 0. It optimizes only for the current step.
+
+**Architecture:**
+* **Input Layer:** Linear (775 to 128) + ReLU + Dropout (0.2)
+* **Hidden Layer:** Linear (128 to 64) + ReLU
+* **Output Layer:** Linear (64 to 1)
+* **Output:** A scalar representing the estimated **Immediate Reward** (probability of a click).
+
+#### B. Deep Q-Network (DQN)
+* **Role:** The "Long-Term" Planner.
+* **Network Type:** Q-Network (approximates Q(s,a)).
+* **RL Components:** Experience Replay (Buffer: 50k), Target Network (Update freq: 50 eps), epsilon-greedy exploration.
+
+**Architecture:**
+* **Input Layer:** Linear (775 to 128) + ReLU + Dropout (0.2)
+* **Hidden Layer:** Linear (128 to 64) + ReLU
+* **Output Layer:** Linear (64 to 1)
+* **Output:** A scalar representing the **Cumulative Future Reward** (Q-value).
+
+#### C. Soft Actor-Critic (SAC)
+* **Role:** The "Diversity" Maximizer.
+* **Network Type:** Discrete Actor-Critic.
+* **Key Mechanic:** Entropy Regularization (alpha = 0.05).
+
+**Architecture (Shared for Actor & Critic):**
+* **Input Layer:** Linear (775 to 128) + ReLU + Dropout (0.2)
+* **Hidden Layer:** Linear (128 to 64) + ReLU
+* **Output Layer:** Linear (64 to 1)
+
+**Components:**
+1.  **Twin Critics (`Q_1, Q_2`):** Two independent networks with the architecture above. The agent uses `min(Q1, Q2)` to prevent value overestimation.
+2.  **Policy (pi):** A third network with the same architecture that outputs logits for the candidate list.
+
 
 ## Interactive RL Environment
 ### Backend (Flask API)
