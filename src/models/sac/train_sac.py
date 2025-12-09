@@ -23,7 +23,7 @@ def train_sac():
         learning_rate=3e-4
     )
     
-    num_episodes =100000 # SAC is usually sample efficient
+    num_episodes =10000
     batch_size = 64
     save_freq = 5000
     
@@ -59,11 +59,20 @@ def train_sac():
         # Logging
         if episode > 0 and episode % 1000 == 0:
             avg_reward = np.mean(rewards_history[-1000:])
-            tqdm.write(f"Ep {episode} | Avg Reward: {avg_reward:.3f} | Alpha: {agent.alpha.item():.3f}")
+            tqdm.write(f"Ep {episode} | Avg Reward: {avg_reward:.3f} | Alpha: {agent.alpha:.3f}")
 
     # Save Final
     torch.save(agent.policy.state_dict(), Path(data_dir) / 'sac_model.pth')
     print("Saved SAC model.")
+
+    # Plot Training Curve
+    plt.figure(figsize=(10,5))
+    plt.plot(np.convolve(rewards_history, np.ones(100)/100, mode='valid'))
+    plt.title('SAC Training Rewards (Moving Avg)')
+    plt.xlabel('Episode')
+    plt.ylabel('Total Reward')
+    plt.savefig('result/sac_training.png')
+    print("Training plot saved to result/sac_training.png")
 
 if __name__ == "__main__":
     train_sac()

@@ -32,7 +32,7 @@ def train_ddqn():
     )
     
     # Training Parameters
-    num_episodes = 100000
+    num_episodes = 10000
     target_update_freq = 10
     batch_size = 64
     
@@ -96,7 +96,7 @@ def train_ddqn():
     plt.title('Dueling DQN Training Rewards (Moving Avg)')
     plt.xlabel('Episode')
     plt.ylabel('Total Reward')
-    plt.savefig('ddqn_training.png')
-    print("Training plot saved to ddqn_training.png")
+    plt.savefig('result/ddqn_training.png')
+    print("Training plot saved to result/ddqn_training.png")
 if __name__ == "__main__":
     train_ddqn()

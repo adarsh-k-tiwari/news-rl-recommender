@@ -39,9 +39,9 @@ class SACAgent:
         learning_rate=3e-4, 
         gamma=0.99,
         tau=0.005,          
-        alpha=0.2,          
-        automatic_entropy_tuning=True,
-        buffer_size=50000,
+        alpha=0.05,          
+        automatic_entropy_tuning=False,
+        buffer_size=10000,
         device='cpu'
     ):
         self.device = device

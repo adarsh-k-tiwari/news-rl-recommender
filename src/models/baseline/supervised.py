@@ -112,7 +112,7 @@ class SupervisedAgent:
         self.model = model
         self.article_encoder = article_encoder
         self.device = device
-        # self.model.to(device)
+        self.model.to(device)
         self.model.eval()
 
     def predict(self, state, env):
@@ -120,11 +120,11 @@ class SupervisedAgent:
         Scores all candidates using the network and picks the best one.
         """
         candidates = env.current_candidates
-        state_tensor = torch.FloatTensor(state).unsqueeze(0) #.to(self.device) # [1, state_dim]
+        state_tensor = torch.FloatTensor(state).unsqueeze(0).to(self.device) # [1, state_dim]
         
         # Get embeddings for all candidates
         candidate_embs = env.get_candidate_embeddings() # [K, emb_dim]
-        candidate_tensor = torch.FloatTensor(candidate_embs) #.to(self.device)
+        candidate_tensor = torch.FloatTensor(candidate_embs).to(self.device)
         
         # Repeat state K times to match candidates
         state_repeated = state_tensor.repeat(len(candidates), 1)

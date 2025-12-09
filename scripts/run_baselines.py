@@ -1,7 +1,6 @@
 # run_baselines.py
 
 import numpy as np
-from src.models.cmab.cmab import CMABAgent
 import torch
 import gym
 from tqdm import tqdm
@@ -11,6 +10,7 @@ from src.models.baseline.supervised import SupervisedAgent, ClickPredictor
 from src.models.dqn.dqn import DQNAgent
 from src.models.dqn.ddqn import DuelingDQNAgent
 from src.models.cmab.cmab import CMABAgent
+from src.models.sac.sac import SACAgent
 
 def evaluate_agent(agent, env, num_episodes=100):
     total_rewards = 0
@@ -46,19 +46,19 @@ def main():
     # print(f"Popularity Agent CTR: {ctr_pop:.4f}")
     
     # # 3. Evaluate Supervised
-    # # Load model
-    # model = ClickPredictor(state_dim=391, article_emb_dim=384)
-    # model.load_state_dict(torch.load('data/processed/supervised_model.pth'))
+    # Load model
+    model = ClickPredictor(state_dim=391, article_emb_dim=384)
+    model.load_state_dict(torch.load('data/processed/supervised_model.pth'))
     
-    # sup_agent = SupervisedAgent(model, env.article_encoder)
-    # ctr_sup, _ = evaluate_agent(sup_agent, env, num_episodes=500)
-    # print(f"Supervised Agent CTR: {ctr_sup:.4f}")
+    sup_agent = SupervisedAgent(model, env.article_encoder)
+    ctr_sup, _ = evaluate_agent(sup_agent, env, num_episodes=500)
+    print(f"Supervised Agent CTR: {ctr_sup:.4f}")
 
     # 4. Evaluate DQN
-    dqn_agent = DQNAgent(state_dim=391, article_emb_dim=384)
-    dqn_agent.policy_net.load_state_dict(torch.load('data/processed/dqn_model.pth'))
-    ctr_dqn, _ = evaluate_agent(dqn_agent, env, num_episodes=500)
-    print(f"DQN Agent CTR: {ctr_dqn:.4f}")
+    # dqn_agent = DQNAgent(state_dim=391, article_emb_dim=384)
+    # dqn_agent.policy_net.load_state_dict(torch.load('data/processed/dqn_model.pth'))
+    # ctr_dqn, _ = evaluate_agent(dqn_agent, env, num_episodes=500)
+    # print(f"DQN Agent CTR: {ctr_dqn:.4f}")
 
     # # 5. Evaluate CMAB
     # cmab_agent = CMABAgent(state_dim=391, article_emb_dim=384)
@@ -71,6 +71,12 @@ def main():
     # ddqn_agent.policy_net.load_state_dict(torch.load('data/processed/dueling_dqn_model.pth'))
     # ctr_ddqn, _ = evaluate_agent(ddqn_agent, env, num_episodes=500)
     # print(f"Dueling DQN Agent CTR: {ctr_ddqn:.4f}")
+
+    # # 7. Evaluate SAC
+    # sac_agent = SACAgent(state_dim=391, article_emb_dim=384)
+    # sac_agent.policy.load_state_dict(torch.load('data/processed/sac_model.pth'))
+    # ctr_sac, _ = evaluate_agent(sac_agent, env, num_episodes=500)
+    # print(f"SAC Agent CTR: {ctr_sac:.4f}")
 
 if __name__ == "__main__":
     main()

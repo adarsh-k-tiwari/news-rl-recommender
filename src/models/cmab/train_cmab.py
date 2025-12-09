@@ -26,7 +26,7 @@ def train_cmab():
         epsilon=0.1 # Constant small exploration is common for Bandits
     )
     
-    num_episodes = 100000
+    num_episodes = 10000
     batch_size = 64
     save_freq = 10000
     
@@ -70,6 +70,15 @@ def train_cmab():
     save_path = Path(data_dir) / 'cmab_model.pth'
     torch.save(agent.net.state_dict(), save_path)
     print(f"Final model saved to {save_path}")
+
+    # Plot Training Curve
+    plt.figure(figsize=(10,5))
+    plt.plot(np.convolve(rewards_history, np.ones(100)/100, mode='valid'))
+    plt.title('CMAB Training Rewards (Moving Avg)')
+    plt.xlabel('Episode')
+    plt.ylabel('Total Reward')
+    plt.savefig('result/cmab_training.png')
+    print("Training plot saved to result/cmab_training.png")
 
 if __name__ == "__main__":
     train_cmab()

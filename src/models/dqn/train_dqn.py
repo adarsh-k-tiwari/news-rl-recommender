@@ -32,7 +32,7 @@ def train_dqn():
     )
     
     # Training Parameters
-    num_episodes = 1000000  # Adjust based on time (5000 is a good start)
+    num_episodes = 10000
     target_update_freq = 10
     batch_size = 64
     

@@ -57,7 +57,7 @@ def train_supervised_baseline():
     dataset = SupervisedDataset(
         sessions, 
         article_encoder, 
-        state_builder=state_builder,  # <--- Critical fix
+        state_builder=state_builder,
         max_samples=10000000
     )
     
