@@ -47,7 +47,7 @@ news-rl-recommender/
 
 ### Prerequisites
 - Python 3.8 or higher
-- Node.js 16+ and npm (for frontend) ( Very Important , Dashboard is made with React) ( Only For UI ## OPTIONAL)
+- Node.js 16+ and npm (for frontend) ( Very Important , Dashboard is made with React) ( Only Needed For Interactive UI ## OPTIONAL)
 - Git
 
 ### 1. Clone Repository
