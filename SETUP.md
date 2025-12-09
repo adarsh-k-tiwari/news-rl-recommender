@@ -17,8 +17,8 @@ pip install -r requirements.txt
 
 2. Make sure you have trained models in `data/processed/`:
    - `supervised_model.pth`
-   - `dqn_model.pth` (optional)
-   - `dueling_dqn_model.pth` (optional)
+   - `dqn_model.pth` 
+   - `dueling_dqn_model.pth` 
 
 3. Start the Flask API server:
 ```bash
