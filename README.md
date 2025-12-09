@@ -87,7 +87,7 @@ Output:
 - It generates comparison plots saved in the experiments/ or results/ directory
 - Console output will display a table ranking the models by performance
 
-## Running the Interactive Application
+## Running the Interactive Application (Optional)
 Read Setup.md first to setup React and Necessary Libraries in system.
 1. **Start the Backend API:**
    ```bash
