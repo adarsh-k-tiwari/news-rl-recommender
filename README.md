@@ -94,7 +94,7 @@ news-rl-recommender/
 
 ## Running the Interactive Application
 
-### Method 2: Manual Start
+### Method 1: Manual Start
 
 1. **Start the Backend API:**
    ```bash
